@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro Mi Primer Día</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background: #f9f9f9;
+    }
+    h2 {
+      margin-top: 1.5rem;
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 2rem;
+      padding: 0.8rem 1.5rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    @media (max-width: 600px) {
+      form {
+        padding: 1rem;
+      }
+      h2 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <form id="formulario">
+    <h2>Cliente</h2>
+    <label for="cliente_nombre">Nombre y apellidos</label>
+    <input id="cliente_nombre" required>
+
+    <label for="cliente_email">Email</label>
+    <input type="email" id="cliente_email">
+
+    <label for="cliente_telefono">Teléfono</label>
+    <input id="cliente_telefono">
+
+    <label for="cliente_direccion">Dirección</label>
+    <input id="cliente_direccion">
+
+    <h2>Bebé</h2>
+    <label for="bebe_nombre">Nombre</label>
+    <input id="bebe_nombre" required>
+
+    <label for="bebe_apellidos">Apellidos</label>
+    <input id="bebe_apellidos" required>
+
+    <label for="bebe_fecha_nacimiento">Fecha de nacimiento</label>
+    <input type="date" id="bebe_fecha_nacimiento" required>
+
+    <label for="bebe_ciudad">Ciudad familiar</label>
+    <input id="bebe_ciudad">
+
+    <label for="bebe_direccion">Dirección familiar</label>
+    <input id="bebe_direccion">
+
+    <label for="padre_nombre">Nombre del padre (opcional)</label>
+    <input id="padre_nombre">
+
+    <label for="madre_nombre">Nombre de la madre (opcional)</label>
+    <input id="madre_nombre">
+
+    <h2>Caja</h2>
+    <label for="caja_numero">Número de caja</label>
+    <input id="caja_numero" required>
+
+    <label for="caja_precio">Precio final (€)</label>
+    <input type="number" step="0.01" id="caja_precio" required>
+
+    <label for="caja_tipo">Tipo de caja</label>
+    <select id="caja_tipo">
+      <option value="1">Caja Básica</option>
+      <option value="2">Caja Premium</option>
+      <option value="3">Caja Deluxe</option>
+    </select>
+
+    <button type="submit">Guardar</button>
+  </form>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
