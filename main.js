@@ -30,6 +30,17 @@ app.on('window-all-closed', function () {
 });
 
 ipcMain.handle('enviar-datos', async (event, datos) => {
-  const resultado = await insertarDatos(datos.cliente, datos.bebe, datos.caja);
-  return resultado;
+  try {
+    console.log('Datos recibidos en el proceso principal:', datos); // Verifica los datos recibidos
+    const resultado = await insertarDatos(datos.cliente, datos.bebe, datos.caja);
+    console.log('Resultado de insertarDatos:', resultado); // Verifica el resultado de la operación
+    if (resultado.success) {
+      return { success: true, message: 'Datos enviados correctamente.' };
+    } else {
+      return { success: false, message: 'Error al guardar los datos.', error: resultado.error };
+    }
+  } catch (error) {
+    console.error('Error inesperado en enviar-datos:', error);
+    return { success: false, message: 'Error inesperado.', error: error.message };
+  }
 });

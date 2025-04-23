@@ -1,5 +1,6 @@
-// renderer.js
-const { ipcRenderer } = window.require('electron');
+
+const enviarDatos = window.electronAPI.enviarDatos;
+
 
 document.getElementById('formulario').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -43,12 +44,12 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
     return;
   }
 
-  const resultado = await ipcRenderer.invoke('enviar-datos', { cliente, bebe, caja });
+  const resultado = await enviarDatos({ cliente, bebe, caja });
 
   if (resultado.success) {
-    alert('Datos guardados con éxito.');
+    alert(resultado.message); // Mensaje de éxito
     document.getElementById('formulario').reset();
   } else {
-    alert('Error al guardar los datos: ' + resultado.error);
+    alert(`Error: ${resultado.message}\nDetalles: ${resultado.error || 'No disponible'}`); // Mensaje de error
   }
 });
