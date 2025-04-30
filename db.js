@@ -64,5 +64,127 @@ pool.getConnection()
       connection.release();
     }
   }
-
-module.exports = { insertarDatos };
+  async function obtenerClientes() {
+    const connection = await pool.getConnection();
+    try {
+      const query = `
+        SELECT 
+          id,
+          nombre_apellidos,
+          email,
+          telefono,
+          direccion,
+          codigo_postal,
+          ciudad,
+          fecha_nacimiento,
+          fecha_de_alta,
+          fecha_ultima_contratacion
+        FROM Clientes
+      `;
+      const [rows] = await connection.execute(query);
+      return rows; // Devuelve los datos de los clientes
+    } catch (error) {
+      console.error('Error al obtener los clientes:', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+  async function obtenerCajas() {
+    const connection = await pool.getConnection();
+    try {
+      const query = `
+        SELECT 
+          Cajas.numero_caja, 
+          TiposCaja.nombre AS tipo_caja, 
+          Cajas.precio_final, 
+          Cajas.estado, 
+          Cajas.fecha_entrega
+        FROM Cajas
+        INNER JOIN TiposCaja ON Cajas.id_tipo_caja = TiposCaja.id
+      `;
+      const [rows] = await connection.execute(query);
+      return rows; // Devuelve los datos de las cajas
+    } catch (error) {
+      console.error('Error al obtener las cajas:', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+  
+  async function obtenerBebes() {
+    const connection = await pool.getConnection();
+    try {
+      const query = `
+        SELECT 
+          id,
+          nombre,
+          apellidos,
+          fecha_nacimiento,
+          lugar_nacimiento,
+          genero,
+          direccion_familiar,
+          codigo_postal_familiar,
+          ciudad_familiar,
+          telefono_contacto,
+          email_contacto,
+          nombre_padre,
+          apellidos_padre,
+          fecha_nacimiento_padre,
+          nombre_madre,
+          apellidos_madre,
+          fecha_nacimiento_madre
+        FROM Bebes
+      `;
+      const [rows] = await connection.execute(query);
+      return rows; // Devuelve los datos de los bebés
+    } catch (error) {
+      console.error('Error al obtener los bebés:', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+  
+  async function eliminarCliente(clienteId) {
+    const connection = await pool.getConnection();
+    try {
+      const query = `DELETE FROM Clientes WHERE id = ?`;
+      await connection.execute(query, [clienteId]);
+      console.log(`Cliente con ID ${clienteId} eliminado.`);
+    } catch (error) {
+      console.error('Error al eliminar el cliente:', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+  async function eliminarCaja(numeroCaja) {
+    const connection = await pool.getConnection();
+    try {
+      const query = `DELETE FROM Cajas WHERE numero_caja = ?`;
+      await connection.execute(query, [numeroCaja]);
+      console.log(`Caja con número ${numeroCaja} eliminada.`);
+    } catch (error) {
+      console.error('Error al eliminar la caja:', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+  async function eliminarBebe(bebeId) {
+    const connection = await pool.getConnection();
+    try {
+      const query = `DELETE FROM Bebes WHERE id = ?`;
+      await connection.execute(query, [bebeId]);
+      console.log(`Bebé con ID ${bebeId} eliminado.`);
+    } catch (error) {
+      console.error('Error al eliminar el bebé:', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+  
+  module.exports = { insertarDatos, obtenerClientes, obtenerBebes, obtenerCajas, eliminarCliente, eliminarCaja, eliminarBebe };

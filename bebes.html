@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bebés</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f9;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      /* Navigation Bar */
+      nav {
+        background-color: #007bff;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 1rem;
+        font-weight: bold;
+        transition: color 0.3s ease;
+      }
+      nav a:hover {
+        color: #ffdd57;
+      }
+
+      /* Table Styles */
+      .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 1rem;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+      table th,
+      table td {
+        padding: 0.8rem;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      table th {
+        background-color: #007bff;
+        color: white;
+      }
+      table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      table tr:hover {
+        background-color: #f1f1f1;
+      }
+      .btn-delete {
+        background-color: #dc3545;
+        color: white;
+      }
+      .btn-delete:hover {
+        background-color: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="renderer.html">Inicio</a>
+      <a href="clientes.html">Clientes</a>
+      <a href="cajas.html">Cajas</a>
+      <a href="bebes.html">Bebés</a>
+    </nav>
+
+    <div class="container">
+      <h2>Lista de Bebés</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Fecha de Nacimiento</th>
+            <th>Ciudad Familiar</th>
+            <th>Dirección Familiar</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="bebes-tbody">
+          <!-- Los datos se cargarán aquí dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      // Cargar datos de bebés desde el proceso principal
+      async function cargarBebes() {
+        try {
+          const response = await window.electron.obtenerBebes(); // Llama al método expuesto en preload.js
+          if (response.success) {
+            const bebes = response.data;
+            const tbody = document.getElementById("bebes-tbody");
+            tbody.innerHTML = ""; // Limpiar contenido previo
+
+            bebes.forEach((bebe) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${bebe.nombre}</td>
+                <td>${bebe.apellidos}</td>
+                <td>${bebe.fecha_nacimiento}</td>
+                <td>${bebe.ciudad_familiar || "N/A"}</td>
+                <td>${bebe.direccion_familiar || "N/A"}</td>
+                <td>
+                  <button class="btn btn-delete" onclick="eliminarBebe(${
+                    bebe.id
+                  })">Eliminar</button>
+                </td>
+              `;
+              tbody.appendChild(row);
+            });
+          } else {
+            console.error("Error al cargar los bebés:", response.message);
+          }
+        } catch (error) {
+          console.error("Error inesperado al cargar los bebés:", error);
+        }
+      }
+      async function eliminarBebe(bebeId) {
+        if (confirm("¿Estás seguro de que deseas eliminar este bebé?")) {
+          try {
+            const response = await window.electron.eliminarBebe(bebeId);
+            if (response.success) {
+              alert("Bebé eliminado correctamente.");
+              cargarBebes(); // Recargar la lista de bebés
+            } else {
+              console.error("Error al eliminar el bebé:", response.message);
+              alert("Error al eliminar el bebé.");
+            }
+          } catch (error) {
+            console.error("Error inesperado al eliminar el bebé:", error);
+            alert("Error inesperado al eliminar el bebé.");
+          }
+        }
+      }
+      // Llamar a la función al cargar la página
+      window.onload = cargarBebes;
+    </script>
+  </body>
+</html>

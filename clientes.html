@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clientes</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f9;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      /* Navigation Bar */
+      nav {
+        background-color: #007bff;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 1rem;
+        font-weight: bold;
+        transition: color 0.3s ease;
+      }
+      nav a:hover {
+        color: #ffdd57;
+      }
+
+      /* Table Styles */
+      .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 1rem;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+      table th,
+      table td {
+        padding: 0.8rem;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      table th {
+        background-color: #007bff;
+        color: white;
+      }
+      table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      table tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+      .btn-edit {
+        background-color: #28a745;
+        color: white;
+      }
+      .btn-edit:hover {
+        background-color: #218838;
+      }
+      .btn-delete {
+        background-color: #dc3545;
+        color: white;
+      }
+      .btn-delete:hover {
+        background-color: #c82333;
+      }
+
+      /* Search Bar */
+      .search-bar {
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .search-bar input {
+        width: 100%;
+        max-width: 300px;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="renderer.html">Inicio</a>
+      <a href="clientes.html">Clientes</a>
+      <a href="cajas.html">Cajas</a>
+      <a href="bebes.html">Bebés</a>
+    </nav>
+
+    <div class="container">
+      <h2>Lista de Clientes</h2>
+      <div class="search-bar">
+        <input type="text" id="search" placeholder="Buscar cliente..." />
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="clientes-tbody">
+          <!-- Las filas de clientes se agregarán aquí dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      // Funcionalidad de búsqueda
+      const searchInput = document.getElementById('search');
+      const tableRows = document.querySelectorAll('#clientes-tbody tr');
+
+      searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        tableRows.forEach((row) => {
+          const cells = row.querySelectorAll('td');
+          const rowText = Array.from(cells)
+            .map((cell) => cell.textContent.toLowerCase())
+            .join(' ');
+          row.style.display = rowText.includes(searchTerm) ? '' : 'none';
+        });
+      });
+
+      // Cargar datos de clientes desde el proceso principal
+      async function cargarClientes() {
+        try {
+          const response = await window.electron.obtenerClientes();
+          if (response.success) {
+            const clientes = response.data;
+            const tbody = document.getElementById('clientes-tbody');
+            tbody.innerHTML = ''; // Limpiar contenido previo
+
+            clientes.forEach(cliente => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${cliente.nombre_apellidos}</td>
+                <td>${cliente.email || 'N/A'}</td>
+                <td>${cliente.telefono || 'N/A'}</td>
+                <td>${cliente.direccion || 'N/A'}</td>
+                <td>
+                  <button class="btn btn-delete" onclick="eliminarCliente(${cliente.id})">Eliminar</button>
+                </td>
+              `;
+              tbody.appendChild(row);
+            });
+          } else {
+            console.error('Error al cargar los clientes:', response.message);
+          }
+        } catch (error) {
+          console.error('Error inesperado al cargar los clientes:', error);
+        }
+      }
+
+      async function eliminarCliente(clienteId) {
+        if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+          try {
+            const response = await window.electron.eliminarCliente(clienteId);
+            if (response.success) {
+              alert('Cliente eliminado correctamente.');
+              cargarClientes(); // Recargar la lista de clientes
+            } else {
+              console.error('Error al eliminar el cliente:', response.message);
+              alert('Error al eliminar el cliente.');
+            }
+          } catch (error) {
+            console.error('Error inesperado al eliminar el cliente:', error);
+            alert('Error inesperado al eliminar el cliente.');
+          }
+        }
+      }
+
+      // Llamar a la función al cargar la página
+      window.onload = cargarClientes;
+    </script>
+  </body>
+</html>
